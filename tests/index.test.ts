@@ -1,28 +1,31 @@
-import { compareTexts, visualizeDiff, DiffResult, Change } from '../src/index';
+import { compareTexts, visualizeDiff, DiffResult, Change } from "../src/index";
 
-describe('compareTexts', () => {
-  test('should identify removed words', () => {
+describe("compareTexts", () => {
+  test("should identify removed words", () => {
     const baseText = "The quick brown fox jumps over the lazy dog";
     const updatedText = "The brown fox jumps over the dog";
 
     const result = compareTexts(baseText, updatedText);
 
+    expect(result.removedPositions).not.toContain(0); // "The"
     expect(result.removedPositions).toContain(1); // "quick"
     expect(result.removedPositions).toContain(7); // "lazy"
+    expect(result.removedPositions.length).toEqual(2); // Only 2 removed
     expect(result.addedPositions).toEqual([]);
   });
 
-  test('should identify added words', () => {
+  test("should identify added words", () => {
     const baseText = "Hello world";
     const updatedText = "Hello beautiful world";
 
     const result = compareTexts(baseText, updatedText);
 
     expect(result.addedPositions).toContain(1); // "beautiful"
+    expect(result.addedPositions.length).toEqual(1); // Only 1 removed
     expect(result.removedPositions).toEqual([]);
   });
 
-  test('should identify both added and removed words', () => {
+  test("should identify both added and removed words", () => {
     const baseText = "The quick brown fox jumps over the lazy dog";
     const updatedText = "The fast brown fox leaps over the sleepy dog";
 
@@ -36,7 +39,7 @@ describe('compareTexts', () => {
     expect(result.addedPositions).toContain(7); // "sleepy"
   });
 
-  test('should handle identical texts', () => {
+  test("should handle identical texts", () => {
     const text = "The quick brown fox";
     const result = compareTexts(text, text);
 
@@ -44,24 +47,24 @@ describe('compareTexts', () => {
     expect(result.addedPositions).toEqual([]);
   });
 
-  test('should handle empty strings', () => {
+  test("should handle empty strings", () => {
     expect(compareTexts("", "")).toEqual({
       removedPositions: [],
-      addedPositions: []
+      addedPositions: [],
     });
 
     expect(compareTexts("hello world", "")).toEqual({
       removedPositions: [0, 1],
-      addedPositions: []
+      addedPositions: [],
     });
 
     expect(compareTexts("", "hello world")).toEqual({
       removedPositions: [],
-      addedPositions: [0, 1]
+      addedPositions: [0, 1],
     });
   });
 
-  test('should handle whitespace properly', () => {
+  test("should handle whitespace properly", () => {
     const baseText = "  hello   world  ";
     const updatedText = "hello world";
 
@@ -71,7 +74,7 @@ describe('compareTexts', () => {
     expect(result.addedPositions).toEqual([]);
   });
 
-  test('should handle complete text replacement', () => {
+  test("should handle complete text replacement", () => {
     const baseText = "original text here";
     const updatedText = "completely different content";
 
@@ -81,7 +84,7 @@ describe('compareTexts', () => {
     expect(result.addedPositions).toEqual([0, 1, 2]);
   });
 
-  test('should handle single word changes', () => {
+  test("should handle single word changes", () => {
     const baseText = "cat";
     const updatedText = "dog";
 
@@ -91,7 +94,7 @@ describe('compareTexts', () => {
     expect(result.addedPositions).toEqual([0]);
   });
 
-  test('should handle insertion at beginning', () => {
+  test("should handle insertion at beginning", () => {
     const baseText = "world test";
     const updatedText = "hello world test";
 
@@ -101,7 +104,7 @@ describe('compareTexts', () => {
     expect(result.addedPositions).toEqual([0]);
   });
 
-  test('should handle insertion at end', () => {
+  test("should handle insertion at end", () => {
     const baseText = "hello world";
     const updatedText = "hello world test";
 
@@ -112,8 +115,8 @@ describe('compareTexts', () => {
   });
 });
 
-describe('visualizeDiff', () => {
-  test('should generate readable diff visualization', () => {
+describe("visualizeDiff", () => {
+  test("should generate readable diff visualization", () => {
     const baseText = "The quick brown fox";
     const updatedText = "The fast brown fox";
 
@@ -126,7 +129,7 @@ describe('visualizeDiff', () => {
     expect(visualization).toContain("fox");
   });
 
-  test('should handle texts with no changes', () => {
+  test("should handle texts with no changes", () => {
     const text = "unchanged text";
     const visualization = visualizeDiff(text, text);
 
@@ -136,7 +139,7 @@ describe('visualizeDiff', () => {
     expect(visualization).toContain("text");
   });
 
-  test('should show only additions', () => {
+  test("should show only additions", () => {
     const baseText = "hello world";
     const updatedText = "hello beautiful world";
 
@@ -146,7 +149,7 @@ describe('visualizeDiff', () => {
     expect(visualization).not.toContain("[-");
   });
 
-  test('should show only removals', () => {
+  test("should show only removals", () => {
     const baseText = "hello beautiful world";
     const updatedText = "hello world";
 
@@ -157,8 +160,8 @@ describe('visualizeDiff', () => {
   });
 });
 
-describe('Edge cases and performance', () => {
-  test('should handle very long texts efficiently', () => {
+describe("Edge cases and performance", () => {
+  test("should handle very long texts efficiently", () => {
     const longText1 = Array(1000).fill("word").join(" ");
     const longText2 = Array(1000).fill("term").join(" ");
 
@@ -171,7 +174,7 @@ describe('Edge cases and performance', () => {
     expect(result.addedPositions).toHaveLength(1000);
   });
 
-  test('should handle special characters', () => {
+  test("should handle special characters", () => {
     const baseText = "hello @world #test $money";
     const updatedText = "hello @universe #test $money";
 
@@ -181,7 +184,7 @@ describe('Edge cases and performance', () => {
     expect(result.addedPositions).toContain(1); // "@universe"
   });
 
-  test('should handle numbers', () => {
+  test("should handle numbers", () => {
     const baseText = "version 1.0.0 is here";
     const updatedText = "version 2.0.0 is here";
 
@@ -189,5 +192,14 @@ describe('Edge cases and performance', () => {
 
     expect(result.removedPositions).toContain(1); // "1.0.0"
     expect(result.addedPositions).toContain(1); // "2.0.0"
+  });
+  test("should handle case sensitivity", () => {
+    const baseText = "version 1.0.0 is here";
+    const updatedText = "Version 1.0.0 is here";
+
+    const result = compareTexts(baseText, updatedText);
+
+    expect(result.removedPositions).toContain(0); // "version"
+    expect(result.addedPositions).toContain(0); // "Version"
   });
 });
