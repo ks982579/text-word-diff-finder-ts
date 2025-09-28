@@ -1,9 +1,9 @@
-interface DiffResult {
+export interface DiffResult {
   removedPositions: number[];
   addedPositions: number[];
 }
 
-interface Change {
+export interface Change {
   type: "added" | "removed" | "unchanged";
   word: string;
   baseIndex?: number;
@@ -151,33 +151,4 @@ export function visualizeDiff(baseText: string, updatedText: string): string {
   return visualization;
 }
 
-// Example usage and tests
-if (require.main === module) {
-  // Test cases
-  const test1 = {
-    base: "The quick brown fox jumps over the lazy dog",
-    updated: "The fast brown fox leaps over the sleepy dog",
-  };
-
-  const test2 = {
-    base: "Hello world this is a test",
-    updated: "Hello beautiful world this is definitely a test",
-  };
-
-  const test3 = {
-    base: "Remove this word and keep the rest",
-    updated: "Keep the rest",
-  };
-
-  console.log("Test 1:");
-  console.log(visualizeDiff(test1.base, test1.updated));
-  console.log("Result:", compareTexts(test1.base, test1.updated));
-
-  console.log("\nTest 2:");
-  console.log(visualizeDiff(test2.base, test2.updated));
-  console.log("Result:", compareTexts(test2.base, test2.updated));
-
-  console.log("\nTest 3:");
-  console.log(visualizeDiff(test3.base, test3.updated));
-  console.log("Result:", compareTexts(test3.base, test3.updated));
-}
+export { compareTexts as default };

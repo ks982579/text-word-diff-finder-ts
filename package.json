@@ -1,11 +1,63 @@
 {
-  "name": "word-diff",
-  "module": "index.ts",
+  "name": "@ks982579/text-word-diff-finder",
+  "version": "0.1.0",
+  "description": "A TypeScript library for finding word-level differences between text strings using the Longest Common Subsequence algorithm.",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "types": "dist/index.d.ts",
   "type": "module",
-  "devDependencies": {
-    "@types/bun": "latest"
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
+    }
   },
-  "peerDependencies": {
-    "typescript": "^5"
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "npm run clean && npm run build:cjs && npm run build:esm && npm run build:types",
+    "build:cjs": "tsc --project tsconfig.cjs.json",
+    "build:esm": "tsc --project tsconfig.esm.json",
+    "build:types": "tsc --project tsconfig.types.json",
+    "clean": "rm -rf dist",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "lint": "tsc --noEmit",
+    "prepublishOnly": "npm run lint && npm run test && npm run build"
+  },
+  "keywords": [
+    "diff",
+    "text-diff",
+    "word-diff",
+    "lcs",
+    "longest-common-subsequence",
+    "typescript",
+    "text-comparison",
+    "string-diff"
+  ],
+  "author": "ksull18",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ksull18/text-word-diff-finder-ts.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ksull18/text-word-diff-finder-ts/issues"
+  },
+  "homepage": "https://github.com/ksull18/text-word-diff-finder-ts#readme",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/node": "^20.0.0",
+    "jest": "^30.2.0",
+    "ts-jest": "^29.4.4",
+    "typescript": "^5.9.2"
   }
 }
