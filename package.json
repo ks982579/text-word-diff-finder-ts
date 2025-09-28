@@ -1,7 +1,7 @@
 {
   "name": "@ks982579/text-word-diff-finder",
   "version": "0.1.0",
-  "description": "A TypeScript library for finding word-level differences between text strings using the Longest Common Subsequence algorithm.",
+  "description": "A high-performance TypeScript library for finding word-level differences between text strings with support for multiple diff algorithms.",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
   "types": "dist/index.d.ts",
