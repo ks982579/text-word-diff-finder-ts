@@ -35,7 +35,7 @@ pnpm add @ks982579/text-word-diff-finder
 ### ES Modules
 
 ```typescript
-import { compareTexts, visualizeDiff } from '@ks982579/text-word-diff-finder';
+import { compareTexts, visualizeDiff } from "@ks982579/text-word-diff-finder";
 
 const baseText = "The quick brown fox jumps over the lazy dog";
 const updatedText = "The fast brown fox leaps over the sleepy dog";
@@ -54,7 +54,10 @@ console.log(visualizeDiff(baseText, updatedText));
 ### CommonJS
 
 ```javascript
-const { compareTexts, visualizeDiff } = require('@ks982579/text-word-diff-finder');
+const {
+  compareTexts,
+  visualizeDiff,
+} = require("@ks982579/text-word-diff-finder");
 
 const result = compareTexts("hello world", "hello beautiful world");
 console.log(result);
@@ -63,47 +66,57 @@ console.log(result);
 
 ## API Reference
 
-### `compareTexts(baseText: string, updatedText: string): DiffResult`
+### `compareTexts(baseText: string, updatedText: string, options?: CompareOptions): DiffResult`
 
 Compares two text strings and returns the positions of added and removed words.
 
 **Parameters:**
+
 - `baseText` (string): The original text to compare against
 - `updatedText` (string): The modified text to compare
+- `options` (CompareOptions, optional): Configuration options for comparison behavior
 
 **Returns:**
+
 ```typescript
 interface DiffResult {
-  removedPositions: number[];  // Array of word positions that were removed
-  addedPositions: number[];    // Array of word positions that were added
+  removedPositions: number[]; // Array of word positions that were removed
+  addedPositions: number[]; // Array of word positions that were added
 }
 ```
 
 **Example:**
+
 ```typescript
-const result = compareTexts(
-  "The quick brown fox",
-  "The slow brown fox"
-);
+const result = compareTexts("The quick brown fox", "The slow brown fox");
 // Returns: { removedPositions: [1], addedPositions: [1] }
+
+// Case-insensitive comparison
+const result2 = compareTexts("Hello World", "hello world", {
+  ignoreCase: true,
+});
+// Returns: { removedPositions: [], addedPositions: [] }
 ```
 
-### `visualizeDiff(baseText: string, updatedText: string): string`
+### `visualizeDiff(baseText: string, updatedText: string, options?: CompareOptions): string`
 
 Creates a human-readable visualization of the differences between two texts.
 
 **Parameters:**
+
 - `baseText` (string): The original text
 - `updatedText` (string): The modified text
+- `options` (CompareOptions, optional): Configuration options for comparison behavior
 
 **Returns:**
 A formatted string showing removals with `[-word]` and additions with `[+word]`.
 
 **Example:**
+
 ```typescript
 const visualization = visualizeDiff(
   "The quick brown fox",
-  "The slow brown fox"
+  "The slow brown fox",
 );
 console.log(visualization);
 // Output:
@@ -122,6 +135,10 @@ export interface DiffResult {
   addedPositions: number[];
 }
 
+export interface CompareOptions {
+  ignoreCase?: boolean; // Default: false
+}
+
 export interface Change {
   type: "added" | "removed" | "unchanged";
   word: string;
@@ -133,6 +150,7 @@ export interface Change {
 ## Use Cases
 
 ### 1. Document Version Comparison
+
 ```typescript
 const originalDoc = "Version 1.0 includes basic features";
 const revisedDoc = "Version 2.0 includes advanced features and bug fixes";
@@ -142,18 +160,21 @@ const changes = compareTexts(originalDoc, revisedDoc);
 ```
 
 ### 2. Real-time Collaborative Editing
+
 ```typescript
 function trackChanges(originalText: string, newText: string) {
   const diff = compareTexts(originalText, newText);
   return {
-    hasChanges: diff.removedPositions.length > 0 || diff.addedPositions.length > 0,
+    hasChanges:
+      diff.removedPositions.length > 0 || diff.addedPositions.length > 0,
     changeCount: diff.removedPositions.length + diff.addedPositions.length,
-    visualization: visualizeDiff(originalText, newText)
+    visualization: visualizeDiff(originalText, newText),
   };
 }
 ```
 
 ### 3. Content Moderation
+
 ```typescript
 const originalComment = "This is a great post about programming";
 const editedComment = "This is an amazing post about web development";
@@ -235,6 +256,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Changelog
 
 ### 0.1.0
+
 - Initial release
 - Core LCS-based diff algorithm
 - TypeScript support with full type definitions
@@ -251,4 +273,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-Made with ❤️ by [ksull18](https://github.com/ksull18)
+Made by [Kevin Sullivan](https://github.com/ks982579)

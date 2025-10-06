@@ -9,7 +9,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Planned Features
 
-- **Case-insensitive comparison option**: Add optional parameter to make word comparisons case-insensitive
 - **Word-level change detection**: Detect modifications within words (capitalization, pluralization, typos) rather than treating them as complete replacements
 - **Similarity scoring**: Implement fuzzy matching to identify similar words (e.g., "cat" vs "cats", "color" vs "colour")
 - **Multiple diff algorithms**: Support for different algorithms based on use case and performance requirements
@@ -46,6 +45,41 @@ Different algorithms excel in different scenarios:
 - Undo/redo change tracking
 - Collaborative editing conflict resolution
 - Automatic algorithm selection based on text characteristics
+
+## [0.2.0] - 2025-10-06
+
+### Added
+
+- **Case-Insensitive Comparison**: New `CompareOptions` interface with `ignoreCase` option
+  - `compareTexts()` now accepts optional third parameter for configuration
+  - `visualizeDiff()` now accepts optional third parameter for configuration
+  - Words are compared case-insensitively when `{ ignoreCase: true }` is passed
+  - Default behavior remains case-sensitive for backward compatibility
+- **Enhanced Type Definitions**: Exported `CompareOptions` interface
+- **Comprehensive Test Coverage**: Added 11 new tests covering case-insensitive functionality
+  - Mixed case matching scenarios
+  - Edge cases with empty strings and uppercase/lowercase
+  - Performance validation with case-insensitive enabled
+  - Integration tests with `visualizeDiff()`
+
+### Changed
+
+- Updated `compareTexts()` signature to accept optional `CompareOptions` parameter
+- Updated `visualizeDiff()` signature to accept optional `CompareOptions` parameter
+- Enhanced internal `computeLCS()` function with configurable word comparison logic
+
+### Technical Details
+
+- Implemented efficient case-insensitive comparison using `toLowerCase()` only when needed
+- No performance degradation when using default case-sensitive mode
+- Maintains O(m × n) time complexity for both case-sensitive and case-insensitive modes
+- Full backward compatibility - all existing code continues to work without changes
+
+### Documentation
+
+- Updated README.md with case-insensitive examples
+- Added `CompareOptions` to type definitions documentation
+- Updated API reference with new optional parameters
 
 ## [0.1.0] - 2025-09-28
 
