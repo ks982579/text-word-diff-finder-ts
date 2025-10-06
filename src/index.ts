@@ -10,15 +10,21 @@ export interface Change {
   updatedIndex?: number;
 }
 
+export interface CompareOptions {
+  ignoreCase?: boolean;
+}
+
 /**
  * Compares two text strings and returns the positions of added and removed words
  * @param baseText - The original text
  * @param updatedText - The modified text
+ * @param options - Optional configuration for comparison behavior
  * @returns Object containing arrays of word positions for removed and added content
  */
 export function compareTexts(
   baseText: string,
   updatedText: string,
+  options?: CompareOptions,
 ): DiffResult {
   const baseWords = baseText
     .trim()
@@ -29,7 +35,7 @@ export function compareTexts(
     .split(/\s+/)
     .filter((word) => word.length > 0);
 
-  const changes = computeLCS(baseWords, updatedWords);
+  const changes = computeLCS(baseWords, updatedWords, options);
 
   const removedPositions: number[] = [];
   const addedPositions: number[] = [];
@@ -52,9 +58,18 @@ export function compareTexts(
  * Computes the Longest Common Subsequence (LCS) to find differences
  * This is the core algorithm used by most diff tools
  */
-function computeLCS(baseWords: string[], updatedWords: string[]): Change[] {
+function computeLCS(baseWords: string[], updatedWords: string[], options?: CompareOptions): Change[] {
   const m = baseWords.length;
   const n = updatedWords.length;
+  const ignoreCase = options?.ignoreCase ?? false;
+
+  // Helper function to compare words based on options
+  const wordsEqual = (word1: string, word2: string): boolean => {
+    if (ignoreCase) {
+      return word1.toLowerCase() === word2.toLowerCase();
+    }
+    return word1 === word2;
+  };
 
   // Create LCS table
   const lcs: number[][] = Array(m + 1)
@@ -64,7 +79,7 @@ function computeLCS(baseWords: string[], updatedWords: string[]): Change[] {
   // Fill LCS table
   for (let i = 1; i <= m; i++) {
     for (let j = 1; j <= n; j++) {
-      if (baseWords[i - 1] === updatedWords[j - 1]) {
+      if (wordsEqual(baseWords[i - 1], updatedWords[j - 1])) {
         lcs[i][j] = lcs[i - 1][j - 1] + 1;
       } else {
         lcs[i][j] = Math.max(lcs[i - 1][j], lcs[i][j - 1]);
@@ -78,7 +93,7 @@ function computeLCS(baseWords: string[], updatedWords: string[]): Change[] {
     j = n;
 
   while (i > 0 || j > 0) {
-    if (i > 0 && j > 0 && baseWords[i - 1] === updatedWords[j - 1]) {
+    if (i > 0 && j > 0 && wordsEqual(baseWords[i - 1], updatedWords[j - 1])) {
       // Words are the same
       changes.unshift({
         type: "unchanged",
@@ -114,10 +129,11 @@ function computeLCS(baseWords: string[], updatedWords: string[]): Change[] {
  * Helper function to visualize the diff (useful for debugging)
  * @param baseText - The original text
  * @param updatedText - The modified text
+ * @param options - Optional configuration for comparison behavior
  * @returns A string representation of the changes
  */
-export function visualizeDiff(baseText: string, updatedText: string): string {
-  const result = compareTexts(baseText, updatedText);
+export function visualizeDiff(baseText: string, updatedText: string, options?: CompareOptions): string {
+  const result = compareTexts(baseText, updatedText, options);
   const baseWords = baseText
     .trim()
     .split(/\s+/)

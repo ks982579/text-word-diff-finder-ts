@@ -203,3 +203,124 @@ describe("Edge cases and performance", () => {
     expect(result.addedPositions).toContain(0); // "Version"
   });
 });
+
+describe("Case-insensitive comparison", () => {
+  test("should match words with different cases when ignoreCase is true", () => {
+    const baseText = "Hello World Test";
+    const updatedText = "hello world test";
+
+    const result = compareTexts(baseText, updatedText, { ignoreCase: true });
+
+    expect(result.removedPositions).toEqual([]);
+    expect(result.addedPositions).toEqual([]);
+  });
+
+  test("should still detect different words even with ignoreCase", () => {
+    const baseText = "The quick brown fox";
+    const updatedText = "The FAST brown fox";
+
+    const result = compareTexts(baseText, updatedText, { ignoreCase: true });
+
+    expect(result.removedPositions).toContain(1); // "quick"
+    expect(result.addedPositions).toContain(1); // "FAST"
+  });
+
+  test("should handle mixed case changes", () => {
+    const baseText = "Version 1.0.0 is HERE";
+    const updatedText = "version 1.0.0 is here";
+
+    const result = compareTexts(baseText, updatedText, { ignoreCase: true });
+
+    expect(result.removedPositions).toEqual([]);
+    expect(result.addedPositions).toEqual([]);
+  });
+
+  test("should work with visualizeDiff when ignoreCase is true", () => {
+    const baseText = "Hello World";
+    const updatedText = "hello world";
+
+    const visualization = visualizeDiff(baseText, updatedText, { ignoreCase: true });
+
+    expect(visualization).not.toContain("[-");
+    expect(visualization).not.toContain("[+");
+    expect(visualization).toContain("Hello");
+    expect(visualization).toContain("hello");
+  });
+
+  test("should still be case-sensitive by default", () => {
+    const baseText = "Hello World";
+    const updatedText = "hello world";
+
+    const result = compareTexts(baseText, updatedText);
+
+    expect(result.removedPositions).toEqual([0, 1]);
+    expect(result.addedPositions).toEqual([0, 1]);
+  });
+
+  test("should handle ignoreCase: false explicitly", () => {
+    const baseText = "Hello World";
+    const updatedText = "hello world";
+
+    const result = compareTexts(baseText, updatedText, { ignoreCase: false });
+
+    expect(result.removedPositions).toEqual([0, 1]);
+    expect(result.addedPositions).toEqual([0, 1]);
+  });
+
+  test("should handle case-insensitive with additions and removals", () => {
+    const baseText = "The QUICK brown FOX jumps";
+    const updatedText = "the quick BROWN fox leaps";
+
+    const result = compareTexts(baseText, updatedText, { ignoreCase: true });
+
+    expect(result.removedPositions).toContain(4); // "jumps"
+    expect(result.addedPositions).toContain(4); // "leaps"
+    expect(result.removedPositions).not.toContain(0); // "The/the" should match
+    expect(result.removedPositions).not.toContain(1); // "QUICK/quick" should match
+  });
+
+  test("should preserve original word case in Change objects", () => {
+    const baseText = "Hello World";
+    const updatedText = "hello world";
+
+    const result = compareTexts(baseText, updatedText, { ignoreCase: true });
+
+    // Even though words match with ignoreCase, no changes should be reported
+    expect(result.removedPositions).toEqual([]);
+    expect(result.addedPositions).toEqual([]);
+  });
+
+  test("should handle empty strings with ignoreCase", () => {
+    const result1 = compareTexts("", "", { ignoreCase: true });
+    expect(result1).toEqual({ removedPositions: [], addedPositions: [] });
+
+    const result2 = compareTexts("HELLO", "", { ignoreCase: true });
+    expect(result2).toEqual({ removedPositions: [0], addedPositions: [] });
+
+    const result3 = compareTexts("", "world", { ignoreCase: true });
+    expect(result3).toEqual({ removedPositions: [], addedPositions: [0] });
+  });
+
+  test("should handle all uppercase vs all lowercase", () => {
+    const baseText = "THE QUICK BROWN FOX";
+    const updatedText = "the quick brown fox";
+
+    const result = compareTexts(baseText, updatedText, { ignoreCase: true });
+
+    expect(result.removedPositions).toEqual([]);
+    expect(result.addedPositions).toEqual([]);
+  });
+
+  test("should handle performance with ignoreCase enabled", () => {
+    const longText1 = Array(1000).fill("WORD").join(" ");
+    const longText2 = Array(1000).fill("word").join(" ");
+
+    const start = Date.now();
+    const result = compareTexts(longText1, longText2, { ignoreCase: true });
+    const duration = Date.now() - start;
+
+    expect(duration).toBeLessThan(1000);
+    expect(result.removedPositions).toEqual([]);
+    expect(result.addedPositions).toEqual([]);
+  });
+});
