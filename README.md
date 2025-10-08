@@ -10,11 +10,14 @@ A high-performance TypeScript library for finding word-level differences between
 
 - 🚀 **Fast & Efficient**: Uses optimized LCS algorithm for accurate diff detection
 - 📝 **Word-Level Granularity**: Identifies differences at word boundaries, not character level
+- 🎨 **HTML Formatting**: Generate styled HTML output with customizable highlighting (browser-only)
+- 🔒 **XSS Protected**: Enterprise-grade security with comprehensive protection against injection attacks
 - 🔧 **TypeScript Native**: Built with TypeScript, includes full type definitions
 - 📦 **Universal**: Supports both ES modules and CommonJS
-- 🧪 **Well Tested**: Comprehensive test suite with 100% coverage
+- 🧪 **Well Tested**: Comprehensive test suite with 58 passing tests
 - 📋 **Zero Dependencies**: Lightweight with no external dependencies
 - 🎯 **Simple API**: Easy-to-use functions with clear return values
+- 🎭 **Case-Insensitive Option**: Optional case-insensitive text comparison
 
 ## Installation
 
@@ -127,6 +130,63 @@ console.log(visualization);
 // The [+slow] brown fox
 ```
 
+### `formatDiffAsHtml(baseText: string, updatedText: string, options?: HtmlFormatOptions): string`
+
+**⚠️ Browser Only**: This function requires a browser environment with the DOM API.
+
+Generates styled HTML output with highlighted differences. Perfect for displaying diffs in web applications.
+
+**Parameters:**
+
+- `baseText` (string): The original text
+- `updatedText` (string): The modified text
+- `options` (HtmlFormatOptions, optional): Configuration for HTML formatting and styling
+
+**Returns:**
+HTML string with `<span>` elements for changed words, including CSS classes and inline styles.
+
+**Example:**
+
+```typescript
+import { formatDiffAsHtml } from "@ks982579/text-word-diff-finder";
+
+const html = formatDiffAsHtml(
+  "The quick brown fox",
+  "The fast brown fox",
+  {
+    ignoreCase: false,
+    addedStyle: {
+      className: "my-addition",
+      highlightColor: "#90EE90",
+      applyHighlighting: true,
+      applyLineThrough: false,
+    },
+    removedStyle: {
+      className: "my-removal",
+      highlightColor: "#FFB6C1",
+      applyHighlighting: true,
+      applyLineThrough: true,
+    },
+  }
+);
+
+document.getElementById("diff-output").innerHTML = html;
+// Output: The <span class="my-removal" style="background-color: #FFB6C1; text-decoration: line-through">quick</span>
+//         <span class="my-addition" style="background-color: #90EE90">fast</span> brown fox
+```
+
+**Default Styling:**
+
+- **Added words**: Light green background (`#90EE90`), class `diff-added`
+- **Removed words**: Light pink background (`#FFB6C1`), class `diff-removed`, line-through
+
+**Security:**
+
+This function includes comprehensive XSS protection:
+- Automatic HTML entity escaping via DOM APIs
+- Class name sanitization to prevent attribute injection
+- Safe handling of malicious input
+
 ### Type Definitions
 
 ```typescript
@@ -137,6 +197,19 @@ export interface DiffResult {
 
 export interface CompareOptions {
   ignoreCase?: boolean; // Default: false
+}
+
+export interface HtmlFormatOptions {
+  ignoreCase?: boolean; // Pass-through to compareTexts
+  addedStyle?: WordStyleOptions;
+  removedStyle?: WordStyleOptions;
+}
+
+export interface WordStyleOptions {
+  applyHighlighting?: boolean; // Default: true
+  highlightColor?: string; // Default: "#90EE90" (added), "#FFB6C1" (removed)
+  className?: string; // Default: "diff-added" or "diff-removed"
+  applyLineThrough?: boolean; // Default: false (added), true (removed)
 }
 
 export interface Change {
@@ -159,7 +232,23 @@ const changes = compareTexts(originalDoc, revisedDoc);
 // Identify what changed between document versions
 ```
 
-### 2. Real-time Collaborative Editing
+### 2. Web-Based Diff Viewer
+
+```typescript
+import { formatDiffAsHtml } from "@ks982579/text-word-diff-finder";
+
+// In your React/Vue/Angular component
+function DiffViewer({ original, modified }) {
+  const html = formatDiffAsHtml(original, modified, {
+    addedStyle: { className: "text-success" },
+    removedStyle: { className: "text-danger" },
+  });
+
+  return <div dangerouslySetInnerHTML={{ __html: html }} />;
+}
+```
+
+### 3. Real-time Collaborative Editing
 
 ```typescript
 function trackChanges(originalText: string, newText: string) {
@@ -173,7 +262,7 @@ function trackChanges(originalText: string, newText: string) {
 }
 ```
 
-### 3. Content Moderation
+### 4. Content Moderation
 
 ```typescript
 const originalComment = "This is a great post about programming";
@@ -207,9 +296,11 @@ The library is optimized for real-world usage:
 ## Browser Support
 
 - ✅ Modern browsers (ES2020+)
-- ✅ Node.js 16+
+- ✅ Node.js 16+ (HTML formatting requires browser environment)
 - ✅ TypeScript 4.5+
 - ✅ Both ES modules and CommonJS
+
+**Note**: The `formatDiffAsHtml()` function is browser-only and requires the DOM API. Other functions work in both Node.js and browser environments.
 
 ## Development
 
@@ -255,15 +346,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Changelog
 
-### 0.1.0
-
-- Initial release
-- Core LCS-based diff algorithm
-- TypeScript support with full type definitions
-- Comprehensive test suite
-- Support for both ES modules and CommonJS
-- Visual diff representation
-- Zero external dependencies
+See [CHANGELOG.md](CHANGELOG.md) for a detailed history of changes.
 
 ## Related Projects
 

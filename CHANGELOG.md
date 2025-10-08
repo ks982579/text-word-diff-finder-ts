@@ -14,7 +14,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Multiple diff algorithms**: Support for different algorithms based on use case and performance requirements
 - **Custom word tokenization**: Allow custom regex patterns for word splitting
 - **Diff context**: Provide surrounding context for changes
-- **HTML output formatter**: Generate HTML with highlighted changes
 - **Character-level fallback**: For detected word changes, show character-level differences
 
 ### Algorithm Options (Future Roadmap)
@@ -45,6 +44,98 @@ Different algorithms excel in different scenarios:
 - Undo/redo change tracking
 - Collaborative editing conflict resolution
 - Automatic algorithm selection based on text characteristics
+
+## [0.3.0] - 2025-10-08
+
+### Added
+
+- **HTML Formatting API**: New `formatDiffAsHtml()` function for browser environments
+  - Generates styled HTML with highlighted differences using DOM APIs
+  - Supports custom CSS class names for easy styling integration
+  - Configurable background colors for highlighting
+  - Optional line-through decoration for removed words
+  - Pass-through support for `ignoreCase` option
+- **Comprehensive XSS Protection**: Enterprise-grade security measures
+  - Automatic HTML entity escaping via `textContent` property
+  - Class name sanitization to prevent attribute injection attacks
+  - Protection against 12+ attack vectors (script injection, event handlers, data URIs, etc.)
+  - 13 dedicated security tests covering XSS scenarios
+- **Type Definitions**: Three new exported interfaces
+  - `HtmlFormatOptions`: Configuration for HTML formatting
+  - `WordStyleOptions`: Styling options for added/removed words
+  - Full TypeScript support with DOM type integration
+
+### Changed
+
+- **TypeScript Configuration**: Added DOM library for browser API support
+  - Updated `tsconfig.json` to include DOM types
+  - Maintains compatibility with Node.js environments
+- **Implementation Approach**: Refactored from string concatenation to programmatic DOM manipulation
+  - Uses `document.createElement()` and `document.createTextNode()`
+  - More maintainable and type-safe implementation
+  - Better performance for complex HTML generation
+
+### Security
+
+- **XSS Prevention**: Comprehensive protection against cross-site scripting
+  - Script tag injection blocked
+  - Event handler injection blocked (`onerror`, `onload`, etc.)
+  - JavaScript protocol blocked (`javascript:`)
+  - Data URI XSS blocked
+  - SVG-based XSS blocked
+  - iframe injection blocked
+  - HTML entity double-encoding attacks prevented
+  - Null byte injection handled
+  - Attribute breakout attempts blocked
+  - Class name injection sanitized
+
+### Technical Details
+
+- **Browser-Only Function**: `formatDiffAsHtml()` requires browser environment
+  - Throws descriptive error when called in Node.js
+  - Runtime environment detection via `typeof document`
+- **Default Styling**:
+  - Added words: Light green background (`#90EE90`), class `diff-added`
+  - Removed words: Light pink background (`#FFB6C1`), class `diff-removed`, line-through decoration
+- **Customization Options**:
+  - `applyHighlighting`: Toggle background colors (default: true)
+  - `highlightColor`: Custom hex/rgb colors
+  - `className`: Custom CSS classes for styling hooks
+  - `applyLineThrough`: Toggle strikethrough text (default: true for removed, false for added)
+- **Test Coverage**: Added 16 new tests (45 → 58 total)
+  - HTML generation with various styling options
+  - XSS security validation
+  - Environment detection
+  - Edge cases (empty strings, special characters, etc.)
+
+### Documentation
+
+- Updated implementation to use modern DOM APIs
+- Added comprehensive security documentation
+- JSDoc comments with `@throws` annotation for environment errors
+
+### Example Usage
+
+```typescript
+import { formatDiffAsHtml } from "@ks982579/text-word-diff-finder";
+
+const html = formatDiffAsHtml("The quick brown fox", "The fast brown fox", {
+  ignoreCase: false,
+  addedStyle: {
+    className: "my-addition",
+    highlightColor: "#90EE90",
+    applyHighlighting: true,
+    applyLineThrough: false,
+  },
+  removedStyle: {
+    className: "my-removal",
+    highlightColor: "#FFB6C1",
+    applyHighlighting: true,
+    applyLineThrough: true,
+  },
+});
+// Returns: The <span class="my-removal" style="...">quick</span> <span class="my-addition" style="...">fast</span> brown fox
+```
 
 ## [0.2.0] - 2025-10-06
 
@@ -136,14 +227,14 @@ When adding entries:
 
 ## Version Planning
 
-### v0.2.0 (Next Minor Release)
+### v0.4.0 (Next Minor Release)
 
-Focus on case-insensitive options and basic word similarity
+Focus on Myers' Algorithm for performance-critical applications and custom word tokenization
 
-### v0.3.0
+### v0.5.0
 
-Focus on word-level change detection and character-level fallback
+Focus on word-level change detection, Patience Diff, and character-level fallback
 
 ### v1.0.0 (Stable Release)
 
-Feature-complete with all core functionality, performance optimized
+Feature-complete with all core functionality, multiple algorithms, performance optimized
