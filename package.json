@@ -1,6 +1,6 @@
 {
   "name": "@ks982579/text-word-diff-finder",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "A high-performance TypeScript library for finding word-level differences between text strings with support for multiple diff algorithms.",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
