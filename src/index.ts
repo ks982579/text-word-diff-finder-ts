@@ -25,6 +25,8 @@ export interface HtmlFormatOptions {
   ignoreCase?: boolean;
   addedStyle?: WordStyleOptions;
   removedStyle?: WordStyleOptions;
+  showRemoved?: boolean;
+  showAdded?: boolean;
 }
 
 /**
@@ -185,8 +187,18 @@ export function visualizeDiff(baseText: string, updatedText: string, options?: C
  * @param baseText - The original text
  * @param updatedText - The modified text
  * @param options - Optional configuration for HTML formatting and comparison behavior
+ * @param options.ignoreCase - Compare words case-insensitively (default: false)
+ * @param options.addedStyle - Styling options for added words
+ * @param options.removedStyle - Styling options for removed words
+ * @param options.showRemoved - Toggle highlighting of removed words (default: true)
+ * @param options.showAdded - Toggle highlighting of added words (default: true)
  * @returns HTML string with styled diff markup
  * @throws Error if called in a non-browser environment (requires document API)
+ * @example
+ * // Side-by-side diff: left side shows only removals
+ * const leftHtml = formatDiffAsHtml(base, updated, { showAdded: false });
+ * // Side-by-side diff: right side shows only additions
+ * const rightHtml = formatDiffAsHtml(base, updated, { showRemoved: false });
  */
 export function formatDiffAsHtml(
   baseText: string,
@@ -233,6 +245,10 @@ export function formatDiffAsHtml(
   const addedStyle = { ...defaultAddedStyle, ...options?.addedStyle };
   const removedStyle = { ...defaultRemovedStyle, ...options?.removedStyle };
 
+  // Determine what to show (default: show both)
+  const showRemoved = options?.showRemoved ?? true;
+  const showAdded = options?.showAdded ?? true;
+
   // Helper function to sanitize className to prevent attribute injection
   const sanitizeClassName = (className: string): string => {
     // Remove any characters that could break out of the class attribute
@@ -274,9 +290,17 @@ export function formatDiffAsHtml(
     }
 
     if (change.type === "removed") {
-      container.appendChild(createStyledSpan(change.word, "removed"));
+      if (showRemoved) {
+        container.appendChild(createStyledSpan(change.word, "removed"));
+      } else {
+        container.appendChild(document.createTextNode(change.word));
+      }
     } else if (change.type === "added") {
-      container.appendChild(createStyledSpan(change.word, "added"));
+      if (showAdded) {
+        container.appendChild(createStyledSpan(change.word, "added"));
+      } else {
+        container.appendChild(document.createTextNode(change.word));
+      }
     } else {
       container.appendChild(document.createTextNode(change.word));
     }

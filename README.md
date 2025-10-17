@@ -203,6 +203,8 @@ export interface HtmlFormatOptions {
   ignoreCase?: boolean; // Pass-through to compareTexts
   addedStyle?: WordStyleOptions;
   removedStyle?: WordStyleOptions;
+  showRemoved?: boolean; // Default: true - Toggle highlighting of removed words
+  showAdded?: boolean; // Default: true - Toggle highlighting of added words
 }
 
 export interface WordStyleOptions {
@@ -232,19 +234,31 @@ const changes = compareTexts(originalDoc, revisedDoc);
 // Identify what changed between document versions
 ```
 
-### 2. Web-Based Diff Viewer
+### 2. Side-by-Side Diff Viewer
 
 ```typescript
 import { formatDiffAsHtml } from "@ks982579/text-word-diff-finder";
 
 // In your React/Vue/Angular component
-function DiffViewer({ original, modified }) {
-  const html = formatDiffAsHtml(original, modified, {
-    addedStyle: { className: "text-success" },
-    removedStyle: { className: "text-danger" },
+function SideBySideDiffViewer({ original, modified }) {
+  // Left side - show only removals
+  const leftHtml = formatDiffAsHtml(original, modified, {
+    showAdded: false,
+    removedStyle: { highlightColor: "#FFB6C1" }
   });
 
-  return <div dangerouslySetInnerHTML={{ __html: html }} />;
+  // Right side - show only additions
+  const rightHtml = formatDiffAsHtml(original, modified, {
+    showRemoved: false,
+    addedStyle: { highlightColor: "#90EE90" }
+  });
+
+  return (
+    <div className="diff-container">
+      <div className="diff-left" dangerouslySetInnerHTML={{ __html: leftHtml }} />
+      <div className="diff-right" dangerouslySetInnerHTML={{ __html: rightHtml }} />
+    </div>
+  );
 }
 ```
 

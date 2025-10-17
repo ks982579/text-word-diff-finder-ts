@@ -9,6 +9,49 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Planned Features
 
+## [0.3.1] - 2025-10-17
+
+### Added
+
+- **Selective Highlighting Control**: New options to independently control which changes are highlighted
+  - `showRemoved` option in `HtmlFormatOptions` - Toggle highlighting of removed words (default: true)
+  - `showAdded` option in `HtmlFormatOptions` - Toggle highlighting of added words (default: true)
+  - Enables side-by-side diff views where left shows only removals and right shows only additions
+  - All words remain in output; flags only control styling/highlighting
+- **Enhanced Type Definitions**: Updated `HtmlFormatOptions` interface with new filtering options
+- **Comprehensive Test Coverage**: Added 8 new tests for filtering functionality (58 → 66 total tests)
+  - Tests for showing only removals or only additions
+  - Tests for hiding all highlighting
+  - Backward compatibility verification
+  - Integration tests with custom styling and `ignoreCase` option
+
+### Technical Details
+
+- Maintains full backward compatibility - default behavior unchanged (shows both removed and added)
+- Filtering happens at rendering time, not during diff computation
+- Works seamlessly with all existing options (`ignoreCase`, custom styles, etc.)
+- Zero performance impact when using defaults
+
+### Use Cases
+
+Perfect for implementing side-by-side diff viewers:
+
+```typescript
+// Left side - show only what was removed from original
+const leftHtml = formatDiffAsHtml(baseText, updatedText, {
+  showAdded: false,
+  removedStyle: { highlightColor: "#FFB6C1" }
+});
+
+// Right side - show only what was added in updated version
+const rightHtml = formatDiffAsHtml(baseText, updatedText, {
+  showRemoved: false,
+  addedStyle: { highlightColor: "#90EE90" }
+});
+```
+
+### Planned Features
+
 - **Word-level change detection**: Detect modifications within words (capitalization, pluralization, typos) rather than treating them as complete replacements
 - **Similarity scoring**: Implement fuzzy matching to identify similar words (e.g., "cat" vs "cats", "color" vs "colour")
 - **Multiple diff algorithms**: Support for different algorithms based on use case and performance requirements

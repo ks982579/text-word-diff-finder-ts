@@ -753,4 +753,109 @@ describe("formatDiffAsHtml", () => {
     expect(html).toContain("@universe");
     expect(html).toContain("#test");
   });
+
+  describe("showRemoved and showAdded filtering", () => {
+    test("should show only removed words when showAdded is false", () => {
+      const baseText = "The quick brown fox";
+      const updatedText = "The fast brown fox";
+
+      const html = formatDiffAsHtml(baseText, updatedText, { showAdded: false });
+
+      expect(html).toContain('<span class="diff-removed"');
+      expect(html).toContain("quick");
+      expect(html).not.toContain('<span class="diff-added"');
+      expect(html).toContain("fast"); // Word still present, just not highlighted
+    });
+
+    test("should show only added words when showRemoved is false", () => {
+      const baseText = "The quick brown fox";
+      const updatedText = "The fast brown fox";
+
+      const html = formatDiffAsHtml(baseText, updatedText, { showRemoved: false });
+
+      expect(html).toContain('<span class="diff-added"');
+      expect(html).toContain("fast");
+      expect(html).not.toContain('<span class="diff-removed"');
+      expect(html).toContain("quick"); // Word still present, just not highlighted
+    });
+
+    test("should show no highlighting when both showRemoved and showAdded are false", () => {
+      const baseText = "The quick brown fox";
+      const updatedText = "The fast brown fox";
+
+      const html = formatDiffAsHtml(baseText, updatedText, {
+        showRemoved: false,
+        showAdded: false,
+      });
+
+      expect(html).not.toContain("<span");
+      expect(html).toContain("quick");
+      expect(html).toContain("fast");
+      expect(html).toContain("brown");
+    });
+
+    test("should show both by default (backward compatibility)", () => {
+      const baseText = "The quick brown fox";
+      const updatedText = "The fast brown fox";
+
+      const html = formatDiffAsHtml(baseText, updatedText);
+
+      expect(html).toContain('<span class="diff-removed"');
+      expect(html).toContain('<span class="diff-added"');
+    });
+
+    test("should work with only additions in text", () => {
+      const baseText = "hello world";
+      const updatedText = "hello beautiful world";
+
+      const htmlShowAll = formatDiffAsHtml(baseText, updatedText);
+      expect(htmlShowAll).toContain('<span class="diff-added"');
+
+      const htmlHideAdded = formatDiffAsHtml(baseText, updatedText, { showAdded: false });
+      expect(htmlHideAdded).not.toContain("<span");
+      expect(htmlHideAdded).toContain("beautiful");
+    });
+
+    test("should work with only removals in text", () => {
+      const baseText = "hello beautiful world";
+      const updatedText = "hello world";
+
+      const htmlShowAll = formatDiffAsHtml(baseText, updatedText);
+      expect(htmlShowAll).toContain('<span class="diff-removed"');
+
+      const htmlHideRemoved = formatDiffAsHtml(baseText, updatedText, { showRemoved: false });
+      expect(htmlHideRemoved).not.toContain("<span");
+      expect(htmlHideRemoved).toContain("beautiful");
+    });
+
+    test("should combine with custom styling options", () => {
+      const baseText = "old text";
+      const updatedText = "new text";
+
+      const html = formatDiffAsHtml(baseText, updatedText, {
+        showRemoved: false,
+        addedStyle: {
+          className: "custom-add",
+          highlightColor: "#00FF00",
+        },
+      });
+
+      expect(html).toContain('class="custom-add"');
+      expect(html).toContain("background-color: #00FF00");
+      expect(html).not.toContain("diff-removed");
+      expect(html).toContain("old"); // Present but not styled
+    });
+
+    test("should work with ignoreCase option", () => {
+      const baseText = "Hello WORLD test";
+      const updatedText = "hello world TEST";
+
+      const html = formatDiffAsHtml(baseText, updatedText, {
+        ignoreCase: true,
+        showRemoved: false,
+      });
+
+      expect(html).not.toContain("<span");
+    });
+  });
 });
